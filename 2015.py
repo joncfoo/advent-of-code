@@ -163,6 +163,46 @@ def day6():
 def day7():
 	with open('data/2015-07') as f:
 		data = [line.strip() for line in f.readlines()]
+	signals = {}
+	for line in data:
+		parts = line.split(' ')
+		(var, expression) = (parts[-1], parts[0:len(parts)-2])
+		signals[var] = list(map(lambda x: int(x) if x[0].isdigit() else x, expression))
+	for k,v in signals.items():
+		if len(v) == 1:
+			signals[k] = v[0]
+
+	def eval(expr):
+		match expr:
+			case [left, 'AND', right]:
+				return eval(left) & eval(right)
+			case [left, 'OR', right]:
+				return eval(left) | eval(right)
+			case [left, 'LSHIFT', right]:
+				return eval(left) << right
+			case [left, 'RSHIFT', right]:
+				return eval(left) >> right
+			case [x]:
+				return eval(signals[x])
+			case ['NOT', var]:
+				return eval([var]) ^ 0xFFFF
+			case other:
+				if type(other) is str:
+					res = signals[other]
+					if type(res) is int:
+						return res
+					else:
+						res = eval(res)
+						signals[other] = res
+						return res
+				elif type(other) is int:
+					return other
+				print(f'not implemented: "{other}"')
+				raise Exception('not implemented')
+
+	part1 = eval('a')
+	print(f'2015-07: {part1}')
+	# for part2, replace "b" value in data with part1 answer and re-run
 
 
 #for d in range(1,26):
