@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.11
 
 import collections
 import hashlib
@@ -205,9 +205,43 @@ def day7():
 	# for part2, replace "b" value in data with part1 answer and re-run
 
 
+def day8():
+	with open('data/2015-08', 'rb') as f:
+		data = [line.strip() for line in f.readlines()]
+	def decode(line):
+		(i, e) = (0, -2)
+		while i < len(line):
+			char = line[i]
+			if char != ord('\\'):
+				i += 1
+			elif line[i+1] == ord('\\'):
+				i += 2
+			elif line[i+1] == ord('\"'):
+				i += 2
+			else:
+				char = chr(int(f'{line[i+2]}{line[i+3]}', 16))
+				i += 4
+			e += 1
+		return i - e
+	def encode(line):
+		e = 2
+		for i in range(len(line)):
+			char = chr(line[i])
+			if char == '\"':
+				e += 2
+			elif char == '\\':
+				e += 2
+			else:
+				e += 1
+		i += 1
+		return e-i
+	part1 = sum([decode(line) for line in data])
+	part2 = sum([encode(line) for line in data])
+	print(f'2015-08: {part1} {part2}')
+
 #for d in range(1,26):
 #	method = globals().get(f'day{d}')
 #	if method:
 #		method()
 
-day7()
+day8()
